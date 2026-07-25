@@ -16,7 +16,8 @@ __pycache__/
 node_modules/
 dist/
 
-
+#ignore virtual enviroment in push
+venv/
 
 
 
