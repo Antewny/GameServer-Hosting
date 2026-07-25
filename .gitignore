@@ -1,0 +1,24 @@
+#Minecraft world and server files
+minecraft-data/
+
+#Environment Variables
+.env
+
+#macOS
+.DS_Store
+
+#Python
+__pycache__/
+*.pyc
+.venv/
+
+#Frontend
+node_modules/
+dist/
+
+
+
+
+
+
+

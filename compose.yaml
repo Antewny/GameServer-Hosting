@@ -1,0 +1,21 @@
+#Docker compose file 
+
+#will define containers that belong to this project
+services:
+  minecraft:
+    image: itzg/minecraft-server:latest #the image docker will use for mc container
+    container_name: gameserver-minecraft #to identify the container
+    #will need to change later because everything will have the same name 
+    ports:
+      - "25565:25565" #HOST_PORT:CONTAINER_PORT
+      #traffic sent to port x on mac gets forwarded to port x inside mc container
+
+    environment: #without container will start and stop, config values passed into container
+      EULA: "TRUE" #minecraft server req accept MOjang END User License agreement
+   
+    volumes: #keeps minecraft world and server files from disapearing when container deleted
+      - ./minecraft-data:/data #HOST_FOLDER:CONTAINER_FOLDER
+      #connect the minecraft-data folder on mac to /data in container, store important data
+    
+    restart: unless-stopped #restart the container automatically if crashes or docker restarts
+      #unless intentionally stopped
