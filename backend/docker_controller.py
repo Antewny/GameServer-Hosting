@@ -1,5 +1,5 @@
 import docker
-import sys
+#import sys
 
 client = docker.from_env()
 #connection between python and docker
@@ -10,42 +10,45 @@ client = docker.from_env()
 container = client.containers.get("gameserver-minecraft")
 
 
-if len(sys.argv) < 2:
-  print("Usage: python3 docker_controller.py start|etc")
-  sys.exit(1)
+#if len(sys.argv) < 2:
+ # print("Usage: python3 docker_controller.py start|etc")
+ # sys.exit(1)
 
 
-command = sys.argv[1] #this read a command line argument after the fact
+#command = sys.argv[1] #this read a command line argument after the fact
 
-if command == "start":
+def get_status():
+  container.reload()
+  return container.status
+
+def start_server():
+  contqiner.reload()
+  if container.status == "running":
+    return "The container is already running"
+
   container.start()
   container.reload()
-  print("You have started the container")
+  
+  return "The container is now running"
 
-elif command == "stop":
-  container.stop()
+def stop_server():
   container.reload()
-  print("You have stopped the container")
+  if container.status == "running":
+    container.stop()
+    container.reload()
+  
+    return "The container has been stopped"
+  
+  return "The container is already stopped"
 
-elif command == "restart":
+def restart_server():
   container.restart()
   container.reload()
-  print("You have restarted the container")
 
-elif command == "status":
-  container.reload()
-  print(f"Status: {container.status}") 
+  return "The container has been restarted"
 
-
-
-
-#container.start()
-#container.reload() #update make sure old data is not being read
-
-#print(sys.argv[1])
-
-print(container.name)
-print(container.status)
+#print(container.name)
+#print(container.status)
 
 
 #loop through and see every container
