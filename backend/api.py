@@ -1,7 +1,8 @@
 #this will be for the api communication
 #imports fastapi
 from fastapi import FastAPI
-from backend.docker_controller import get_status, start_server, stop_server, restart_server
+from backend.docker_controller import(get_status, 
+start_server, stop_server, restart_server, get_server_info)
 
 app = FastAPI()
 
@@ -13,17 +14,20 @@ def home():
 
 @app.get("/status")
 def status():
-  return {"status": get_status()}
+  return get_status()
 
 @app.post("/start")
 def start():
-  return {"start": start_server()}
+  return start_server()
 
 @app.post("/stop")
 def stop():
-  return {"stop": stop_server()}
+  return stop_server()
 
 @app.post("/restart")
 def restart():
-  return {"restart": restart_server()}
+  return restart_server()
 
+@app.get("/info")
+def info():
+  return get_server_info()

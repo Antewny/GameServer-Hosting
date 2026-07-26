@@ -19,17 +19,29 @@ container = client.containers.get("gameserver-minecraft")
 
 def get_status():
   container.reload()
-  return container.status
+  return {
+  "success": True,
+  "status": container.status,
+  "message": "Container status"
+  }
 
 def start_server():
-  contqiner.reload()
+  container.reload()
   if container.status == "running":
-    return "The container is already running"
+    return {
+    "success": False,
+    "status": container.status,
+    "message": "Container already started"
+    }
 
   container.start()
   container.reload()
   
-  return "The container is now running"
+  return {
+  "success": True,
+  "status": container.status,
+  "message": "Container started"
+  }
 
 def stop_server():
   container.reload()
@@ -37,15 +49,38 @@ def stop_server():
     container.stop()
     container.reload()
   
-    return "The container has been stopped"
+    return {
+    "success": True,
+    "status": container.status,
+    "message": "Container stopped"
+    }
   
-  return "The container is already stopped"
+  return {
+  "success": False,
+  "status": container.status,
+  "message": "Container already stopped"
+  }
 
 def restart_server():
   container.restart()
   container.reload()
 
-  return "The container has been restarted"
+  return {
+  "success": True,
+  "status": container.status,
+  "message": "Container restarted"
+  }
+
+def get_server_info():
+  container.reload()
+
+  return {
+  "name": container.name,
+  "status": container.status,
+  "image": container.image.tags[0]
+  }
+
+
 
 #print(container.name)
 #print(container.status)
