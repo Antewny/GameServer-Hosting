@@ -80,7 +80,16 @@ def get_server_info():
   "image": container.image.tags[0]
   }
 
+def get_server_logs():
+  logs = container.logs(tail=100)
+  #gets most recent 100 log lines
 
+  return {
+    "success": True,
+    "logs": logs.decode("utf-8"),
+#returned as bytes so convert to string 
+    "message": "Container logs retrieved"
+  }
 
 #print(container.name)
 #print(container.status)

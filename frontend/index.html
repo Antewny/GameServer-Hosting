@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Game Server Hosting</title>
+ <!-- connects the page to css -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h1>Minecraft Server Dashboard</h1>
+
+  <p>
+    Status:
+    <span id="server-status">Unknown</span>
+  </p>
+
+  <button id="check-status-button">Check Status</button>
+
+  <div>
+    <button id="start-button">Start</button>
+    <button id="stop-button">Stop</button>
+    <button id="restart-button">Restart</button>
+    <button id="logs-button">View Logs</button>
+  </div>
+
+    <h2>Server Logs</h2>
+
+    <pre id="server-logs">No logs loaded.</pre>
+
+
+  <p id="message"></p>
+
+  <script src="app.js"></script>
+</body>
+</html>
