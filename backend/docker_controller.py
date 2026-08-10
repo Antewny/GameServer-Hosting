@@ -7,7 +7,7 @@ client = docker.from_env()
 #containers contains alll containers running or not
 #containers = client.containers.list(all = True)
 
-container = client.containers.get("gameserver-minecraft")
+#container = client.containers.get("gameserver-minecraft")
 
 
 #if len(sys.argv) < 2:
@@ -17,7 +17,51 @@ container = client.containers.get("gameserver-minecraft")
 
 #command = sys.argv[1] #this read a command line argument after the fact
 
-def get_status():
+
+def get_container(name):
+  return client.containers.get(f"gameserver-{name}")
+
+def list_servers():
+  containers = client.containers.list(all=True)
+
+  servers = []
+
+  for container in containers:
+    if container.name.startswith("gameserver-"):
+      servers.append({
+        "name": container.name,
+        "status": container.status
+      })
+
+  return servers
+
+
+
+def create_server(name, port):
+    container_name = f"gameserver-{name}"
+
+    new_container = client.containers.run(
+        "itzg/minecraft-server:latest",
+        name=container_name,
+        detach=True,
+        ports={"25565/tcp": port},
+        environment={
+            "EULA": "TRUE"
+        }
+    )
+
+    new_container.reload()
+
+    return {
+        "success": True,
+        "name": new_container.name,
+        "status": new_container.status,
+        "port": port,
+        "message": "Server created"
+    }
+
+def get_status(name):
+  container = get_container(name)
   container.reload()
   return {
   "success": True,
@@ -25,7 +69,8 @@ def get_status():
   "message": "Container status"
   }
 
-def start_server():
+def start_server(name):
+  container = get_container(name)
   container.reload()
   if container.status == "running":
     return {
@@ -43,7 +88,8 @@ def start_server():
   "message": "Container started"
   }
 
-def stop_server():
+def stop_server(name):
+  container = get_container(name)
   container.reload()
   if container.status == "running":
     container.stop()
@@ -61,7 +107,8 @@ def stop_server():
   "message": "Container already stopped"
   }
 
-def restart_server():
+def restart_server(name):
+  container = get_container(name)
   container.restart()
   container.reload()
 
@@ -71,7 +118,8 @@ def restart_server():
   "message": "Container restarted"
   }
 
-def get_server_info():
+def get_server_info(name):
+  container = get_container(name)
   container.reload()
 
   return {
@@ -80,7 +128,8 @@ def get_server_info():
   "image": container.image.tags[0]
   }
 
-def get_server_logs():
+def get_server_logs(name):
+  container = get_container(name)
   logs = container.logs(tail=100)
   #gets most recent 100 log lines
 
@@ -98,6 +147,7 @@ def get_server_logs():
 #loop through and see every container
 #for container in containers:
 
-
+# if __name__ == "__main__":
+  #  print(create_server("creative", 25566))
 
 

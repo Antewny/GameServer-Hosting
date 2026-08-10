@@ -7,10 +7,16 @@ const restartButton = document.getElementById("restart-button");
 const messageText = document.getElementById("message");
 const logsButton = document.getElementById("logs-button");
 const serverLogs = document.getElementById("server-logs");
+const serverList = document.getElementById("server-list");
+const selectedServerText = document.getElementById("selected-server");
+
+
+let selectedServer = "minecraft";
+
 
 async function checkStatus() {
   try {
-    const response = await fetch("http://127.0.0.1:8000/status");
+    const response = await fetch(`http://127.0.0.1:8000/servers/${selectedServer}/status`);
 
     if (!response.ok) {
       throw new Error(`HTTP error: ${response.status}`);
@@ -25,12 +31,46 @@ async function checkStatus() {
   }
 }
 
+async function loadServers() {
+  try {
+    const response = await fetch("http://127.0.0.1:8000/servers");
+
+    if (!response.ok) {
+      throw new Error(`HTTP error: ${response.status}`);
+    }
+
+    const servers = await response.json();
+
+    serverList.innerHTML = "";
+
+    for (const server of servers) {
+      const button = document.createElement("button");
+
+      button.textContent = `${server.name} - ${server.status}`;
+
+      button.addEventListener("click", function () {
+        selectedServer = server.name.replace("gameserver-", "");
+
+        selectedServerText.textContent = selectedServer;
+
+        checkStatus();
+        getLogs();
+      });
+
+      serverList.appendChild(button);
+    }
+
+  } catch (error) {
+    console.error(error);
+  }
+}
+
 async function sendServerCommand(endpoint) {
   try {
     messageText.textContent = "Working...";
 
     const response = await fetch(
-      `http://127.0.0.1:8000/${endpoint}`,
+      `http://127.0.0.1:8000/servers/${selectedServer}/${endpoint}`,
       {
         method: "POST"
       }
@@ -52,7 +92,7 @@ async function sendServerCommand(endpoint) {
 
 async function getLogs() {
   try {
-    const response = await fetch("http://127.0.0.1:8000/logs");
+    const response = await fetch(`http://127.0.0.1:8000/servers/${selectedServer}/logs`);
 
     if (!response.ok) {
       throw new Error(`HTTP error: ${response.status}`);
@@ -87,3 +127,5 @@ stopButton.addEventListener("click", function () {
 restartButton.addEventListener("click", function () {
   sendServerCommand("restart");
 });
+
+loadServers();

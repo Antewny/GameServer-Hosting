@@ -8,11 +8,17 @@
 #CORS - cross-origin resource sharing
 
 from fastapi.middleware.cors import CORSMiddleware
-
+from pydantic import BaseModel
 
 from fastapi import FastAPI
-from backend.docker_controller import(get_status, get_server_logs, 
-start_server, stop_server, restart_server, get_server_info)
+from backend.docker_controller import(get_status, get_server_logs, list_servers, 
+start_server, stop_server, restart_server, get_server_info, create_server)
+
+class ServerCreateRequest(BaseModel):
+  name: str
+  port: int
+
+
 
 app = FastAPI()
 
@@ -32,32 +38,42 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+@app.post("/servers")
+def create_new_server(server: ServerCreateRequest):
+  return create_server(server.name, server.port)
+
+@app.get("/servers")
+def servers():
+  return list_servers()
+
 #when someone send a GET req to / run func below 
 @app.get("/")
 def home():
   return {"message": "GameServeHosting API"}
 
 
-@app.get("/status")
-def status():
-  return get_status()
+@app.get("/servers/{name}/status")
+def status(name: str):
+  return get_status(name)
 
-@app.post("/start")
-def start():
-  return start_server()
+#name: str is a hint saying name will be a string
 
-@app.post("/stop")
-def stop():
-  return stop_server()
+@app.post("/servers/{name}/start")
+def start(name: str):
+  return start_server(name)
 
-@app.post("/restart")
-def restart():
-  return restart_server()
+@app.post("/servers/{name}/stop")
+def stop(name: str):
+  return stop_server(name)
 
-@app.get("/info")
-def info():
-  return get_server_info()
+@app.post("/servers/{name}/restart")
+def restart(name: str):
+  return restart_server(name)
 
-@app.get("/logs")
-def logs():
-  return get_server_logs()
+@app.get("/servers/{name}/info")
+def info(name: str):
+  return get_server_info(name)
+
+@app.get("/servers/{name}/logs")
+def logs(name: str):
+  return get_server_logs(name)
