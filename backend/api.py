@@ -16,7 +16,7 @@ start_server, stop_server, restart_server, get_server_info, create_server)
 
 class ServerCreateRequest(BaseModel):
   name: str
-  port: int
+  #port: int
 
 
 
@@ -40,7 +40,7 @@ app.add_middleware(
 
 @app.post("/servers")
 def create_new_server(server: ServerCreateRequest):
-  return create_server(server.name, server.port)
+  return create_server(server.name)
 
 @app.get("/servers")
 def servers():

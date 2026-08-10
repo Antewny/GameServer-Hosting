@@ -22,24 +22,51 @@ def get_container(name):
   return client.containers.get(f"gameserver-{name}")
 
 def list_servers():
-  containers = client.containers.list(all=True)
+    containers = client.containers.list(all=True)
 
-  servers = []
+    servers = []
 
-  for container in containers:
-    if container.name.startswith("gameserver-"):
-      servers.append({
-        "name": container.name,
-        "status": container.status
-      })
+    for container in containers:
+        if container.name.startswith("gameserver-"):
+            container.reload()
 
-  return servers
+            ports = container.attrs["NetworkSettings"]["Ports"]
 
+            host_port = None
 
+            if ports.get("25565/tcp"):
+                host_port = int(
+                    ports["25565/tcp"][0]["HostPort"]
+                )
 
-def create_server(name, port):
+            servers.append({
+                "name": container.name,
+                "status": container.status,
+                "port": host_port
+            })
+
+    return servers
+
+def find_next_port():
+
+    containers = client.containers.list(all=True)
+    used_ports = []
+    for container in containers:
+        container.reload()
+        ports = container.attrs["NetworkSettings"]["Ports"]
+        if "25565/tcp" in ports and ports["25565/tcp"] is not None:
+            host_port = ports["25565/tcp"][0]["HostPort"]
+            used_ports.append(int(host_port))
+    port = 25565
+    while port in used_ports:
+
+        port += 1
+
+    return port
+
+def create_server(name):
     container_name = f"gameserver-{name}"
-
+    port = find_next_port()
     new_container = client.containers.run(
         "itzg/minecraft-server:latest",
         name=container_name,

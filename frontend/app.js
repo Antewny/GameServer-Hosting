@@ -9,7 +9,10 @@ const logsButton = document.getElementById("logs-button");
 const serverLogs = document.getElementById("server-logs");
 const serverList = document.getElementById("server-list");
 const selectedServerText = document.getElementById("selected-server");
-
+const serverNameInput = document.getElementById("server-name-input");
+//const serverPortInput = document.getElementById("server-port-input");
+const createServerButton = document.getElementById("create-server-button");
+const createServerMessage = document.getElementById("create-server-message");
 
 let selectedServer = "minecraft";
 
@@ -65,6 +68,38 @@ async function loadServers() {
   }
 }
 
+async function createServer() {
+  try {
+    const name = serverNameInput.value;
+  //  const port = Number(serverPortInput.value);
+
+    const response = await fetch("http://127.0.0.1:8000/servers", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        name: name,
+    //    port: port
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error: ${response.status}`);
+    }
+
+    const data = await response.json();
+
+    createServerMessage.textContent = data.message;
+
+    await loadServers();
+
+  } catch (error) {
+    console.error(error);
+    createServerMessage.textContent = "Failed to create server";
+  }
+}
+
 async function sendServerCommand(endpoint) {
   try {
     messageText.textContent = "Working...";
@@ -84,6 +119,9 @@ async function sendServerCommand(endpoint) {
 
     messageText.textContent = data.message;
     statusText.textContent = data.status;
+
+    await loadServers();
+
   } catch (error) {
     console.error(error);
     messageText.textContent = "Command failed";
@@ -127,5 +165,7 @@ stopButton.addEventListener("click", function () {
 restartButton.addEventListener("click", function () {
   sendServerCommand("restart");
 });
+
+createServerButton.addEventListener("click", createServer);
 
 loadServers();
