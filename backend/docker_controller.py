@@ -1,6 +1,6 @@
 import docker
 #import sys
-
+import os
 client = docker.from_env()
 #connection between python and docker
 
@@ -64,17 +64,31 @@ def find_next_port():
 
     return port
 
-def create_server(name):
+def create_server(name, server_type, version, modpack = None):
     container_name = f"gameserver-{name}"
     port = find_next_port()
+    
+    if server_type == "MODRINTH":
+      environment = {
+        "EULA": "True",
+        "TYPE": "MODRINTH",
+        "MODRINTH_MODPACK": modpack,
+        "VERSION": version,
+        "MEMORY": "4G"
+
+      }
+    else:
+      environment={
+        "EULA": "TRUE",
+        "TYPE": server_type,
+        "VERSION": version
+      }
     new_container = client.containers.run(
-        "itzg/minecraft-server:latest",
+        "itzg/minecraft-server:java21",
         name=container_name,
         detach=True,
         ports={"25565/tcp": port},
-        environment={
-            "EULA": "TRUE"
-        }
+        environment=environment 
     )
 
     new_container.reload()
@@ -84,6 +98,8 @@ def create_server(name):
         "name": new_container.name,
         "status": new_container.status,
         "port": port,
+        "server_type": server_type,
+        "version": version,
         "message": "Server created"
     }
 

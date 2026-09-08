@@ -16,7 +16,10 @@ start_server, stop_server, restart_server, get_server_info, create_server)
 
 class ServerCreateRequest(BaseModel):
   name: str
-  #port: int
+  server_type: str
+  version: str
+  modpack:str | None = None
+#curse forge will have an extra firls is its the server type
 
 
 
@@ -39,8 +42,14 @@ app.add_middleware(
 )
 
 @app.post("/servers")
+#server: ServerCreateReq func expects server and hint is should be obj of ServerCreateReq
 def create_new_server(server: ServerCreateRequest):
-  return create_server(server.name)
+  return create_server(
+  server.name,
+  server.server_type,
+  server.version,
+  server.modpack
+  )
 
 @app.get("/servers")
 def servers():

@@ -11,9 +11,22 @@ const serverList = document.getElementById("server-list");
 const selectedServerText = document.getElementById("selected-server");
 const serverNameInput = document.getElementById("server-name-input");
 //const serverPortInput = document.getElementById("server-port-input");
+const serverTypeInput = document.getElementById("server-type-input");
+const serverVersionInput = document.getElementById("server-version-input");
+const modpackSection = document.getElementById("modpack-section");
+const modpackInput = document.getElementById("modpack-input");
 const createServerButton = document.getElementById("create-server-button");
 const createServerMessage = document.getElementById("create-server-message");
 
+serverTypeInput.addEventListener("change", function () {
+
+    if (serverTypeInput.value === "MODRINTH") {
+        modpackSection.style.display = "block";
+    } else {
+        modpackSection.style.display = "none";
+        modpackInput.value = "";
+    }
+});
 let selectedServer = "minecraft";
 
 
@@ -72,7 +85,9 @@ async function createServer() {
   try {
     const name = serverNameInput.value;
   //  const port = Number(serverPortInput.value);
-
+    const serverType = serverTypeInput.value;
+    const version = serverVersionInput.value;
+    const modpack = modpackInput.value;
     const response = await fetch("http://127.0.0.1:8000/servers", {
       method: "POST",
       headers: {
@@ -80,6 +95,9 @@ async function createServer() {
       },
       body: JSON.stringify({
         name: name,
+        server_type: serverType,
+        version: version,
+        modpack: modpack
     //    port: port
       })
     });
