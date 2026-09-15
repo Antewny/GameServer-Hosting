@@ -70,25 +70,37 @@ def create_server(name, server_type, version, modpack = None):
     
     if server_type == "MODRINTH":
       environment = {
-        "EULA": "True",
+        "EULA": "TRUE",
         "TYPE": "MODRINTH",
         "MODRINTH_MODPACK": modpack,
         "VERSION": version,
-        "MEMORY": "4G"
+        "MEMORY": "6G"
 
       }
     else:
       environment={
         "EULA": "TRUE",
         "TYPE": server_type,
-        "VERSION": version
+        "VERSION": version,
+        "MEMORY": "6G"
       }
+
+    project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    data_path = os.path.join(project_root, "minecraft-data", name)
+    os.makedirs(data_path, exist_ok=True)
+
     new_container = client.containers.run(
         "itzg/minecraft-server:java21",
         name=container_name,
         detach=True,
         ports={"25565/tcp": port},
-        environment=environment 
+        environment=environment,
+        volumes={
+          data_path: {
+            "bind": "/data",
+            "mode": "rw"
+        }
+    }
     )
 
     new_container.reload()
